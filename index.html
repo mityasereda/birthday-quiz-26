@@ -1,0 +1,1724 @@
+<title>Birthday Quiz #26</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg: #0e1016;
+    --bg-2: #171a23;
+    --card: #1b1e29;
+    --text: #f2ede0;
+    --text-dim: #9a95a6;
+    --rule: rgba(242,237,224,0.14);
+    --gold: #e6b23e;
+    --gold-dim: rgba(230,178,62,0.16);
+    --teal: #45ad9f;
+    --teal-dim: rgba(69,173,159,0.16);
+    --accent: var(--text-dim);
+    --shadow: 0 30px 60px -20px rgba(0,0,0,0.6), 0 10px 24px -12px rgba(0,0,0,0.5);
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"IBM Plex Sans", system-ui, sans-serif;
+    overflow:hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  img{max-width:100%;}
+
+  .app{
+    position:relative;
+    height:100dvh;
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    padding:0 clamp(16px, 4vw, 40px);
+    padding-block: max(16px, env(safe-area-inset-top,0px)) max(16px, env(safe-area-inset-bottom,0px));
+    background:
+      radial-gradient(ellipse 60% 45% at 50% 0%, rgba(242,237,224,0.05), transparent 60%),
+      var(--bg);
+  }
+
+  /* ---------- header chrome ---------- */
+  .chrome{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding-block: 6px 14px;
+    flex-shrink:0;
+    gap:12px;
+  }
+  .brand{
+    font-family:"IBM Plex Mono", monospace;
+    font-size: 0.78rem;
+    font-weight:500;
+    letter-spacing: 0.16em;
+    color: var(--text-dim);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-width:0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .brand b{color:var(--text); font-weight:600;}
+  .brand .sep{color: var(--accent); transition: color .3s ease;}
+  .chrome-right{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+  .round-picker{ position:relative; }
+  .round-tag{
+    appearance:none;
+    -webkit-appearance:none;
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.68rem;
+    letter-spacing:0.12em;
+    color:var(--text-dim);
+    background:transparent;
+    padding:4px 10px;
+    border:1px solid var(--rule);
+    border-radius:999px;
+    white-space:nowrap;
+    cursor:pointer;
+    transition: border-color .2s ease, color .2s ease, background .2s ease;
+  }
+  .round-tag:hover,
+  .round-tag[aria-expanded="true"]{
+    border-color:var(--accent);
+    color:var(--text);
+    background:rgba(242,237,224,0.05);
+  }
+  .round-menu{
+    position:absolute;
+    top:calc(100% + 8px);
+    right:0;
+    width:max-content;
+    min-width:210px;
+    max-width:min(84vw, 300px);
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:6px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    z-index:20;
+  }
+  .round-menu[hidden]{ display:none; }
+  .round-menu-item{
+    appearance:none;
+    -webkit-appearance:none;
+    border:none;
+    background:transparent;
+    color:var(--text);
+    text-align:left;
+    padding:9px 12px;
+    border-radius:9px;
+    cursor:pointer;
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    font-family:"IBM Plex Sans", sans-serif;
+    font-size:0.85rem;
+    line-height:1.3;
+    transition: background .15s ease;
+  }
+  .round-menu-item:hover,
+  .round-menu-item:focus-visible{
+    background:rgba(242,237,224,0.07);
+    outline:none;
+  }
+  .round-menu-item .rn{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.7rem;
+    color:var(--text-dim);
+    flex-shrink:0;
+  }
+  .round-menu-item.current .rn{ color:var(--gold); }
+  .round-menu-item.current .rl{ font-weight:600; }
+  .counter{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.78rem;
+    letter-spacing:0.1em;
+    color:var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    white-space:nowrap;
+  }
+  .fs-btn{
+    appearance:none; border:1px solid var(--rule); background:transparent;
+    color:var(--text-dim); width:30px; height:30px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    font-size:0.85rem; line-height:1;
+    transition: border-color .2s ease, color .2s ease;
+    flex-shrink:0;
+  }
+  .fs-btn:hover{ border-color: var(--accent); color: var(--text); }
+
+  .accent-rule{
+    height:2px; flex-shrink:0; border-radius:2px;
+    background: var(--accent);
+    opacity:0.7;
+    transition: background-color .35s ease;
+  }
+
+  /* ---------- stage ---------- */
+  .stage{
+    flex:1;
+    min-height:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+  }
+  .slide{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* text-only slides (title / divider / end) */
+  .text-slide{
+    flex-direction:column;
+    text-align:center;
+    gap:clamp(14px,3vh,28px);
+  }
+  .headline{
+    font-family:"Fraunces", serif;
+    font-weight:600;
+    font-size:clamp(2.2rem, 9vw, 5.4rem);
+    line-height:1.02;
+    letter-spacing:-0.01em;
+    text-wrap:balance;
+    margin:0;
+  }
+  .headline.small{
+    font-size:clamp(1.7rem, 7.2vw, 3.8rem);
+  }
+  .codeline{
+    font-family:"IBM Plex Mono", monospace;
+    font-weight:500;
+    font-size:clamp(1.1rem, 4.4vw, 2rem);
+    letter-spacing:0.02em;
+    color:var(--text-dim);
+    max-width:min(88vw, 720px);
+    text-wrap:balance;
+  }
+  .codeline .cha{color:var(--gold);}
+  .codeline .gal{color:var(--teal);}
+  .codeline .quote{color:var(--text-dim); font-weight:400;}
+  .divider-eyebrow{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.8rem;
+    letter-spacing:0.24em;
+    color:var(--text-dim);
+  }
+  .round-rule{
+    font-family:"IBM Plex Sans", sans-serif;
+    font-size:clamp(0.85rem, 2.4vw, 1rem);
+    color:var(--text-dim);
+    font-style:italic;
+    max-width:min(80vw, 480px);
+  }
+
+  /* ---------- quiz slides (question / answer) ---------- */
+  .quiz-slide{
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    height:100%;
+    width:100%;
+    gap:clamp(12px,2.2vh,22px);
+    padding-block:4px;
+    padding-inline:clamp(50px, 9vw, 72px);
+    min-height:0;
+  }
+  .q-card{
+    position:relative;
+    z-index:2;
+    width:100%;
+    max-width:760px;
+    max-height:100%;
+    min-height:0;
+    overflow-y:auto;
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:clamp(20px,4vw,36px) clamp(20px,4.6vw,42px);
+    display:flex;
+    flex-direction:column;
+    gap:clamp(10px,1.8vh,16px);
+    scrollbar-width:thin;
+  }
+  .quiz-slide.has-image .q-card{
+    flex:0 1 auto;
+  }
+  .q-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-shrink:0;
+  }
+  .q-top.solo{ justify-content:flex-end; }
+  .term-badge{
+    font-family:"IBM Plex Mono", monospace;
+    font-weight:600;
+    font-size:clamp(0.66rem, 1.7vw, 0.8rem);
+    letter-spacing:0.1em;
+    padding:6px 13px;
+    border-radius:10px;
+    border:1px solid var(--rule);
+    background:rgba(242,237,224,0.04);
+    color:var(--text-dim);
+    text-align:center;
+    white-space:normal;
+  }
+  .term-badge.q{ color:var(--gold); border-color:rgba(230,178,62,0.5); background:var(--gold-dim); }
+  .term-badge.a{ color:var(--teal); border-color:rgba(69,173,159,0.5); background:var(--teal-dim); }
+  .q-index{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.75rem;
+    letter-spacing:0.16em;
+    color:var(--text-dim);
+    flex-shrink:0;
+  }
+
+  /* track bar (metal round: band + song + play button) */
+  .track-bar{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding-bottom:clamp(12px,2vh,16px);
+    margin-bottom:2px;
+    border-bottom:1px dashed var(--rule);
+    flex-shrink:0;
+  }
+  .play-btn{
+    flex-shrink:0;
+    width:46px; height:46px;
+    border-radius:50%;
+    border:1px solid var(--rule);
+    background:rgba(242,237,224,0.04);
+    color:var(--text);
+    font-size:0.95rem;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    transition: border-color .2s ease, background .2s ease, color .2s ease, transform .15s ease;
+  }
+  .play-btn:hover{ border-color:var(--accent); color:var(--accent); }
+  .play-btn:active{ transform:scale(0.94); }
+  .play-btn.is-playing{ background:var(--accent); color:var(--card); border-color:var(--accent); }
+  .track-hint{
+    font-family:"IBM Plex Mono", monospace;
+    font-weight:500;
+    font-size:0.72rem;
+    letter-spacing:0.18em;
+    color:var(--text-dim);
+  }
+
+  .q-body{
+    font-size:clamp(0.94rem, 2.1vw, 1.15rem);
+    line-height:1.58;
+  }
+  .q-body p{ margin:0 0 0.75em 0; }
+  .q-body p:last-child{ margin-bottom:0; }
+  .q-ask{
+    color:var(--text);
+    font-weight:400;
+  }
+  .q-note{
+    font-family:"IBM Plex Sans", sans-serif;
+    font-size:0.85rem;
+    color:var(--text-dim);
+    font-style:italic;
+    margin-top:-0.3em;
+  }
+  .q-quote{
+    margin:0.4em 0;
+    padding:0.2em 0 0.2em 1em;
+    border-left:2px solid var(--rule);
+    font-style:italic;
+    color:var(--text-dim);
+    font-size:0.94em;
+    line-height:1.6;
+  }
+
+  /* myth / testimony / document card (Athena, Tool, Hong Kong) */
+  .myth-card{
+    position:relative;
+    border:1px solid rgba(230,178,62,0.3);
+    border-radius:3px 12px 12px 12px;
+    padding:clamp(20px,3.2vw,26px) clamp(16px,2.8vw,22px) clamp(16px,2.6vw,20px);
+    background: rgba(230,178,62,0.035);
+    margin-top:14px;
+  }
+  .myth-tab{
+    position:absolute;
+    top:-15px; left:16px;
+    background:var(--card);
+    border:1px solid rgba(230,178,62,0.3);
+    border-bottom:none;
+    padding:4px 12px 13px;
+    border-radius:8px 8px 0 0;
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.6rem;
+    font-weight:600;
+    letter-spacing:0.16em;
+    color:var(--gold);
+  }
+  .myth-sub{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.66rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:0.9em;
+    padding-bottom:0.7em;
+    border-bottom:1px dashed var(--rule);
+  }
+  .clue-label{
+    font-family:"IBM Plex Mono", monospace;
+    font-weight:400;
+    letter-spacing:0.04em;
+    color:var(--gold);
+  }
+  .myth-card p{ margin:0 0 0.6em 0; }
+  .myth-card p:last-of-type{ margin-bottom:0; }
+  .myth-aside{
+    margin-top:0.8em !important;
+    font-style:italic;
+    color:var(--text-dim);
+    font-size:0.88em;
+  }
+
+  /* case file (psych: Batman) */
+  .case-file{
+    position:relative;
+    border:1px solid rgba(230,178,62,0.3);
+    border-radius:3px 12px 12px 12px;
+    padding:clamp(20px,3.2vw,26px) clamp(16px,2.8vw,22px) clamp(16px,2.6vw,20px);
+    background:
+      repeating-linear-gradient(0deg, rgba(242,237,224,0.025) 0px, rgba(242,237,224,0.025) 1px, transparent 1px, transparent 28px),
+      rgba(230,178,62,0.035);
+    margin-top:14px;
+  }
+  .case-file-tab{
+    position:absolute;
+    top:-15px; left:16px;
+    background:var(--card);
+    border:1px solid rgba(230,178,62,0.3);
+    border-bottom:none;
+    padding:4px 12px 13px;
+    border-radius:8px 8px 0 0;
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.6rem;
+    font-weight:600;
+    letter-spacing:0.16em;
+    color:var(--gold);
+  }
+  .case-file-stamp{
+    position:absolute;
+    top:14px; right:14px;
+    transform:rotate(-8deg);
+    border:2px solid rgba(198,90,80,0.7);
+    color:rgba(216,110,100,0.85);
+    font-family:"IBM Plex Mono", monospace;
+    font-weight:600;
+    font-size:0.62rem;
+    letter-spacing:0.1em;
+    padding:3px 9px;
+    border-radius:5px;
+    opacity:0.9;
+    white-space:nowrap;
+  }
+  .case-file-title{
+    font-family:"Fraunces", serif;
+    font-weight:600;
+    font-size:clamp(0.92rem, 3.6vw, 1.05rem);
+    color:var(--text);
+    margin-bottom:0.15em;
+    padding-right:78px;
+  }
+  .case-file-sub{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.66rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:0.9em;
+    padding-bottom:0.7em;
+    border-bottom:1px dashed var(--rule);
+  }
+  .redacted{
+    display:inline-block;
+    background:#0a0a0d;
+    color:transparent;
+    border-radius:2px;
+    padding:0 5px;
+    user-select:none;
+  }
+  .case-file p{ margin:0 0 0.6em 0; }
+  .case-file ul{ margin:0 0 0.6em 0; padding-left:1.15em; }
+  .case-file li{ margin-bottom:0.4em; }
+  .case-file li:last-child{ margin-bottom:0; }
+  .cf-label{
+    font-family:"IBM Plex Mono", monospace;
+    font-weight:400;
+    letter-spacing:0.04em;
+    color:var(--gold);
+  }
+  .case-file-sign{
+    margin-top:0.8em;
+    text-align:right;
+    font-style:italic;
+    color:var(--text-dim);
+    font-size:0.88em;
+  }
+
+  .answer-tag{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.75rem;
+    letter-spacing:0.2em;
+    color: var(--accent);
+    flex-shrink:0;
+  }
+  .name{
+    font-family:"Fraunces", serif;
+    font-weight:600;
+    font-size:clamp(1.5rem, 4.6vw, 2.5rem);
+    line-height:1.12;
+    margin:0;
+    text-wrap:balance;
+    flex-shrink:0;
+  }
+  .credit{
+    font-family:"IBM Plex Sans", sans-serif;
+    font-size:0.95rem;
+    color:var(--text-dim);
+    line-height:1.5;
+  }
+
+  .chip-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:2px 0 4px;
+  }
+  .chip{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.78rem;
+    letter-spacing:0.05em;
+    color:var(--text);
+    background:var(--teal-dim);
+    border:1px solid rgba(69,173,159,0.4);
+    padding:5px 12px;
+    border-radius:999px;
+  }
+
+  /* image frames used as clue support */
+  .frame-row{
+    display:flex;
+    gap:10px;
+    width:100%;
+    max-width:640px;
+    flex:1 1 auto;
+    min-height:0;
+    justify-content:center;
+  }
+  .frame-half{
+    position:relative;
+    flex:1 1 0;
+    min-width:0;
+    aspect-ratio: 4 / 5;
+    max-height: min(38vh, 340px);
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--card);
+    box-shadow:var(--shadow);
+    border:1px solid var(--rule);
+  }
+  .frame-half img{
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+  .frame-single{
+    position:relative;
+    width:100%;
+    max-width:320px;
+    flex:0 1 auto;
+    min-height:0;
+    max-height:min(48vh, 440px);
+    aspect-ratio: 650 / 801;
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--card);
+    box-shadow:var(--shadow);
+    border:1px solid var(--rule);
+  }
+  .frame-single img{
+    width:100%; height:100%;
+    object-fit:contain;
+    object-position:50% 50%;
+    background:#fff;
+    display:block;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+  .frame-wide{
+    position:relative;
+    width:100%;
+    max-width:640px;
+    max-height:min(40vh, 360px);
+    aspect-ratio: 16 / 9;
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--card);
+    box-shadow:var(--shadow);
+    border:1px solid var(--rule);
+    flex:0 1 auto;
+    min-height:0;
+  }
+  .frame-wide img{
+    width:100%; height:100%;
+    object-fit:contain;
+    object-position:50% 50%;
+    background:#e8e2d0;
+    box-sizing:border-box;
+    padding:5%;
+    display:block;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+  .frame-wide-alt{
+    position:relative;
+    width:100%;
+    max-width:640px;
+    max-height:min(42vh, 380px);
+    aspect-ratio: 2720 / 1840;
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--card);
+    box-shadow:var(--shadow);
+    border:1px solid var(--rule);
+    flex:0 1 auto;
+    min-height:0;
+  }
+  .frame-wide-alt img{
+    width:100%; height:100%;
+    object-fit:contain;
+    object-position:50% 50%;
+    background:#fff;
+    box-sizing:border-box;
+    padding:2%;
+    display:block;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+  .frame-portrait{
+    position:relative;
+    width:100%;
+    max-width:260px;
+    flex:0 1 auto;
+    min-height:0;
+    max-height:min(46vh, 400px);
+    aspect-ratio: 3 / 4;
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--card);
+    box-shadow:var(--shadow);
+    border:1px solid var(--rule);
+  }
+  .frame-landscape{
+    position:relative;
+    width:100%;
+    max-width:420px;
+    flex:0 1 auto;
+    min-height:0;
+    max-height:min(40vh, 340px);
+    aspect-ratio: 3 / 2;
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--card);
+    box-shadow:var(--shadow);
+    border:1px solid var(--rule);
+  }
+  .frame-portrait img, .frame-landscape img{
+    width:100%; height:100%;
+    object-fit:cover;
+    object-position:50% 30%;
+    display:block;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+  .panel-tag{
+    position:absolute;
+    left:6px; right:6px; bottom:6px;
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.62rem;
+    line-height:1.3;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    text-align:center;
+    color:var(--text-dim);
+    background:rgba(14,16,22,0.66);
+    backdrop-filter: blur(4px);
+    padding:5px 6px;
+    border-radius:7px;
+  }
+
+  /* ---------- picture-guessing slides (CHA-GAL Matrix round) ---------- */
+  .pic-slide{
+    flex-direction:column;
+    gap:clamp(14px,2.4vh,22px);
+    height:100%;
+    padding-block: 4px;
+  }
+  .frame-wrap{
+    position:relative;
+    flex:1;
+    min-height:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .frame{
+    position:relative;
+    height:100%;
+    max-height: min(64vh, 620px);
+    aspect-ratio: 4 / 5;
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--card);
+    box-shadow:var(--shadow);
+    border:1px solid var(--rule);
+  }
+  .frame img{
+    width:100%; height:100%;
+    object-fit:cover;
+    object-position: 50% 16%;
+    display:block;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+  .chagal-frame-dual{
+    display:flex;
+    gap:10px;
+    width:min(94vw, 640px);
+    max-height: min(64vh, 620px);
+  }
+  .chagal-frame-half{
+    position:relative;
+    flex:1 1 0;
+    min-width:0;
+    aspect-ratio: 4 / 5;
+    max-height: min(64vh, 620px);
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--card);
+    box-shadow:var(--shadow);
+    border:1px solid var(--rule);
+  }
+  .chagal-frame-half img{
+    width:100%; height:100%;
+    object-fit:cover;
+    object-position: 50% 16%;
+    display:block;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+  .chagal-frame-half.works img{
+    object-fit:contain;
+    object-position: 50% 50%;
+    background:#e8e2d0;
+    box-sizing:border-box;
+    padding:12%;
+  }
+  .badge{
+    position:absolute;
+    top:14px; left:14px;
+    font-family:"IBM Plex Mono", monospace;
+    font-weight:600;
+    font-size:0.85rem;
+    letter-spacing:0.08em;
+    padding:7px 12px;
+    border-radius:999px;
+    backdrop-filter: blur(6px);
+    border:1px solid transparent;
+  }
+  .badge.cha{ color:var(--gold); background:rgba(14,16,22,0.62); border-color:rgba(230,178,62,0.55); }
+  .badge.gal{ color:var(--teal); background:rgba(14,16,22,0.62); border-color:rgba(69,173,159,0.55); }
+  .caption{
+    flex-shrink:0;
+    text-align:center;
+    min-height: 4.4em;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    gap:4px;
+  }
+  .prompt{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.78rem;
+    letter-spacing:0.22em;
+    color:var(--text-dim);
+  }
+
+  /* ---------- finale slide ---------- */
+  .end-slide{ gap:clamp(18px,3vh,32px); }
+  .end-frame{
+    position:relative;
+    width:auto;
+    height:auto;
+    max-width:min(70vw, 360px);
+    max-height:min(50vh, 480px);
+    border-radius:16px;
+    overflow:hidden;
+    background:var(--card);
+    box-shadow:var(--shadow);
+    border:1px solid var(--rule);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .end-frame img{
+    max-width:100%;
+    max-height:100%;
+    width:auto;
+    height:auto;
+    object-fit:contain;
+    display:block;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+  .end-headline{
+    font-family:"Fraunces", serif;
+    font-weight:600;
+    font-size:clamp(1.5rem, 4.8vw, 2.6rem);
+    line-height:1.2;
+    max-width:min(90vw, 640px);
+    text-wrap:balance;
+    margin:0;
+    color:var(--text);
+  }
+
+  .click-zone{
+    position:absolute; top:0; bottom:0; width:50%;
+    cursor:pointer;
+    z-index:1;
+  }
+  .click-zone.left{left:0;}
+  .click-zone.right{right:0;}
+
+  /* ---------- nav buttons ---------- */
+  .nav-btn{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    width:44px; height:44px;
+    border-radius:50%;
+    border:1px solid var(--rule);
+    background:rgba(23,26,35,0.7);
+    color:var(--text);
+    font-size:1.4rem;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    backdrop-filter: blur(6px);
+    transition: border-color .2s ease, background .2s ease, opacity .2s ease;
+    z-index:5;
+  }
+  .nav-btn:hover{ border-color:var(--accent); background:rgba(23,26,35,0.92); }
+  .nav-btn:disabled{ opacity:0.25; cursor:default; }
+  .nav-prev{ left: clamp(2px, 1vw, 14px); }
+  .nav-next{ right: clamp(2px, 1vw, 14px); }
+
+  /* ---------- footer / progress ---------- */
+  .footer{
+    flex-shrink:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    padding-block: 10px 2px;
+  }
+  .dots{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+    justify-content:center;
+    max-width:100%;
+  }
+  .dot{
+    appearance:none; border:none; padding:0; cursor:pointer;
+    width:8px; height:8px; border-radius:50%;
+    background: var(--rule);
+    box-shadow: 0 0 0 0 transparent;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .dot.gap-before{ margin-left:8px; }
+  .dot.q{ background: var(--gold-dim); box-shadow: inset 0 0 0 1px rgba(230,178,62,0.55); }
+  .dot.a{ background: var(--teal-dim); box-shadow: inset 0 0 0 1px rgba(69,173,159,0.55); }
+  .dot.current{ transform:scale(1.45); }
+  .dot.current.q{ background:var(--gold); }
+  .dot.current.a{ background:var(--teal); }
+  .dot.current:not(.q):not(.a){ background:var(--text-dim); }
+  .hint{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:0.68rem;
+    letter-spacing:0.14em;
+    color:var(--text-dim);
+    opacity:0.65;
+    text-align:center;
+  }
+
+  @media (max-width:520px){
+    .nav-btn{ width:38px; height:38px; font-size:1.2rem; }
+    .q-card{ padding:18px 18px; }
+    .case-file-stamp{ position:static; float:right; margin:0 0 8px 10px; }
+    .case-file-title{ padding-right:0; }
+
+    .frame-row{
+      flex-direction:column;
+      align-items:center;
+      width:auto;
+      max-height:none;
+      flex:0 1 auto;
+    }
+    .frame-half{
+      flex:0 0 auto;
+      width:min(50vw, 200px);
+      height:auto;
+      max-height:none;
+    }
+    .frame-single{
+      max-width:min(60vw, 260px);
+      max-height:none;
+    }
+    .frame-wide{
+      width:min(92vw, 420px);
+      max-height:none;
+    }
+    .frame-wide-alt{
+      max-width:min(92vw, 420px);
+      max-height:none;
+    }
+    .frame-portrait{ max-width:190px; max-height:none; }
+    .frame-landscape{ max-width:min(88vw,360px); max-height:none; }
+
+    .frame{ max-height:48vh; }
+    .chagal-frame-dual{
+      flex-direction:column;
+      align-items:center;
+      width:auto;
+      height:auto;
+      max-height:none;
+    }
+    .chagal-frame-half{
+      flex:0 0 auto;
+      width:min(48vw, 210px);
+      height:auto;
+      max-height:none;
+    }
+
+    .end-frame{ max-width:min(78vw,300px); max-height:44vh; }
+
+    .round-menu{
+      position:fixed;
+      left:16px;
+      right:16px;
+      top:64px;
+      width:auto;
+      max-width:none;
+      min-width:0;
+    }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{ transition:none !important; animation:none !important; }
+  }
+</style>
+
+<div class="app" id="app">
+  <div class="chrome">
+    <div class="brand" id="brandEl"></div>
+    <div class="chrome-right">
+      <div class="round-picker">
+        <button type="button" class="round-tag" id="roundTag" aria-haspopup="true" aria-expanded="false">ROUND 1 OF 5</button>
+        <div class="round-menu" id="roundMenu" role="menu" hidden></div>
+      </div>
+      <div class="counter" id="counter">001 / 111</div>
+      <button class="fs-btn" id="fsBtn" title="Toggle fullscreen" aria-label="Toggle fullscreen">⛶</button>
+    </div>
+  </div>
+  <div class="accent-rule" id="accentRule"></div>
+
+  <div class="stage" id="stage"></div>
+
+  <button class="nav-btn nav-prev" id="prevBtn" aria-label="Previous slide">‹</button>
+  <button class="nav-btn nav-next" id="nextBtn" aria-label="Next slide">›</button>
+
+  <div class="footer">
+    <div class="dots" id="dots"></div>
+    <div class="hint" id="hintEl">← → or tap the edges to move · click a dot to jump</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const FINALE_BRAND = '<b>BIRTHDAY</b><span class="sep" id="brandSep">·</span><b>QUIZ #26</b>';
+
+  /* ================= ROUND 1 — SEPTEMBER 26 ================= */
+  const SEPT26_QUESTIONS = [
+    { body:["In 1580, this English sea captain and privateer sailed into Plymouth, completing only the second circumnavigation of the globe — and the first ever led start-to-finish by a single commander.", "The Spanish, whom he'd spent years raiding, had a far less flattering name for him: El Draque."],
+      ask:"Name Her Majesty's “pirate.”",
+      answer:"Sir Francis Drake",
+      credit:"Elizabeth I knighted him aboard his own ship, the Golden Hind, the following spring — over loud Spanish protests that he was nothing but a pirate." },
+
+    { body:["In 1905 — his so-called annus mirabilis, or miracle year — this physicist published four groundbreaking papers while working as a patent clerk in Switzerland.", "The third of them, published on this exact date, discarded the idea of a fixed, universal time and space, proposing instead that measurements of time and length depend on the observer's own motion."],
+      ask:"Name the physicist — and the theory this paper founded.",
+      answer:"Albert Einstein — special relativity",
+      credit:"The paper was titled “On the Electrodynamics of Moving Bodies.” Einstein was 26 at the time — patent clerk by day, physicist by night." },
+
+    { body:["In 1959, Typhoon Vera — the strongest typhoon ever recorded to make landfall in Japan — struck the country, killing 4,580 people and leaving nearly 1.6 million more homeless."],
+      ask:"Name another famous natural disaster known by a human first name.",
+      note:"(any correctly named example counts)",
+      answerTag:"ACCEPTED ANSWERS",
+      answer:"Any human-named disaster",
+      examples:["Katrina","Javier","Sandy","Mitch","Camille"],
+      credit:"Vera is also remembered as the Isewan Typhoon, after the bay where its storm surge hit hardest." },
+
+    { myth:{
+        tab:"NAME THE TERRITORY",
+        sub:"Sino-British agreement, 26 September 1984",
+        rows:[
+          ["Parties","The United Kingdom and the People's Republic of China"],
+          ["Framework","“One country, two systems” — a high degree of autonomy, promised for 50 years"],
+          ["Formal signing","19 December 1984, by Margaret Thatcher and Zhao Ziyang"],
+          ["Handover","1 July 1997 — sovereignty formally transferred"]
+        ]
+      },
+      answer:"Hong Kong",
+      credit:"The territory had been under British rule since 1842 (Hong Kong Island) and 1898 (the New Territories lease)." },
+
+    { body:["Jacques Chirac, President of France, died on this exact date in 2019."],
+      ask:"Name two other presidents of the Fifth Republic.",
+      note:"(any two correct names count)",
+      answerTag:"ACCEPTED ANSWERS",
+      answer:"Any two other Fifth Republic presidents",
+      examples:["de Gaulle","Pompidou","Giscard d'Estaing","Mitterrand","Sarkozy","Hollande","Macron"],
+      credit:"Chirac served two terms, 1995–2007, and was later convicted of embezzlement — the first French president ever to face a criminal trial." },
+
+    { body:["This company traces its origins to the 1849 California Gold Rush, when a Bavarian immigrant began selling durable work trousers to miners.", "In 1873 it patented the use of copper rivets to reinforce points of strain on denim — and its signature product, the 501, remains one of the most recognizable garments on Earth.", "Its founder died on this exact date, in 1902."],
+      ask:"Name the company.",
+      answer:"Levi Strauss & Co.",
+      credit:"Levi Strauss died in San Francisco, leaving the company to his four nephews — the Stern brothers." },
+
+    { body:["Before entering politics, this Ukrainian billionaire built a confectionery empire so large it earned him the nickname “the Chocolate King.”", "He served as the fifth president of Ukraine from 2014 to 2019, succeeding Viktor Yanukovych and preceding Volodymyr Zelenskyy.", "He was born on this exact date, in 1965."],
+      ask:"Name the Chocolate King.",
+      answer:"Petro Poroshenko",
+      credit:"His confectionery company, Roshen, remains one of the largest in Eastern Europe." },
+
+    { body:["This German footballer captained his national team for nearly a decade, starring as a box-to-box midfielder for Bayer Leverkusen, Bayern Munich and Chelsea.", "Despite his talent, he became infamous for finishing runner-up in an extraordinary number of major finals — including the Champions League, the World Cup, and multiple domestic cups, sometimes all in the same season.", "He was born on this exact date, in 1976."],
+      ask:"Name the nearly-man of German football.",
+      answer:"Michael Ballack",
+      credit:"In 2002 alone he reached the Champions League final, the World Cup final, and the German Cup final with Leverkusen — and lost all three, earning the club the nickname “Vizekusen” (Runner-up-kusen)." },
+
+    { body:["This 1969 album was the last one this British band ever recorded together, though not the last one released.", "Its cover features the four of them walking across a zebra crossing near their recording studio in London, and side two is famous for stitching several short song fragments into one continuous medley."],
+      ask:"Name the album — and the band.",
+      answer:"Abbey Road — The Beatles",
+      credit:"Released on this exact date in 1969. The crossing just outside the studio remains a pilgrimage site for fans today." },
+
+    { body:["A six-year truce — also known as the Treaty of Stary Targ — was agreed on this exact date in 1629 between the Polish–Lithuanian Commonwealth and a Scandinavian rival, ending a run of wars between them stretching back to 1600."],
+      ask:"Name the other country.",
+      answer:"Sweden",
+      credit:"The truce freed Sweden's king, Gustavus Adolphus, to turn his army toward the Thirty Years' War in Germany — where he would make his name." },
+  ];
+
+  /* ================= ROUND 2 — UROBOROS ================= */
+  const UROBOROS_QUESTIONS = [
+    { body:["Chemical elements are often named after famous scientists — it would've been strange if this particular scientist didn't have one named after him.", "This element has atomic number 101, and was the first in history to be synthesized and identified one atom at a time."],
+      ask:"Name the element.",
+      answer:"Mendelevium",
+      credit:"Named for Dmitri Mendeleev, father of the periodic table — first made atom-by-atom at Berkeley in 1955." },
+
+    { body:["The earliest known traces of wine were found near Tbilisi, Georgia, dating to roughly 6000 BCE. But the world's oldest known winery — discovered in 2007 in a cave complex near the village of Areni, in Vayots Dzor Province — sits in a different country entirely."],
+      ask:"Which country is the Areni-1 winery located in?",
+      answer:"Armenia",
+      credit:"The same cave also yielded the oldest known leather shoe — about 5,500 years old." },
+
+    { body:["George Eastman coined this name in the 1880s, partly because he liked the letter K — he found it strong and incisive — and wanted a short word that couldn't be mistaken for any other.", "Its launch slogan: “You press the button, we do the rest.”"],
+      ask:"Name the brand.",
+      answer:"Kodak",
+      credit:"A made-up word, bookended on purpose by Eastman's favorite letter." },
+
+    { body:["During the third quarter of a Super Bowl game, a major power outage plunged the stadium into darkness for over 30 minutes. One brand's social media team turned the moment into an ad within minutes."],
+      ask:"Which brand tweeted this?",
+      answer:"Oreo",
+      images:[{ src:"assets/uro_oreo_redacted.png", alt:"A tweet reading 'Power out? No problem.' with an image of a cookie and the caption 'You can still dunk in the dark', with the account name and logo blacked out", label:"Some details redacted", frame:"single" }],
+      answerImages:[{ src:"assets/uro_oreo_unredacted.png", alt:"The Oreo tweet, unredacted", label:"Posted live, during the blackout", frame:"single" }],
+      credit:"Super Bowl XLVII, 49ers vs. Ravens — real-time marketing before the phrase was even common." },
+
+    { body:["This Linux distribution, based on Debian, is composed primarily of free and open-source software developed by a British company and a community of contributors under a meritocratic governance model.", "Its name comes from a Nguni philosophy — translated roughly as “humanity to others,” or “I am what I am because of who we all are.”"],
+      ask:"Name the distribution.",
+      answer:"Ubuntu",
+      credit:"An operating system quite literally named after the idea that none of us — or our code — exist alone." },
+
+    { ask:"I foresee that team number one is going to successfully answer this question, while team number two has some trouble in front of them.",
+      images:[{ src:"assets/uro_tarot.png", alt:"Two rows of tarot cards: reading one (success) shows the Magician, the Star and the Sun; reading two (failure) shows the Tower, the Ten of Swords and the Five of Cups", frame:"wide-alt" }],
+      answer:"Tarot",
+      credit:"Reading one draws the Magician, the Star and the Sun; reading two draws the Tower, the Ten of Swords and the Five of Cups." },
+
+    { myth:{
+        tab:"WHO AM I?",
+        sub:"Speaking in the first person",
+        sep:":",
+        rows:[
+          ["Hardest","I was never a baby. My birth was so unusual that my mother, the Titaness Metis, was said to have been swallowed by my father before I was born."],
+          ["Origin","I sprang fully grown, wearing armor and shouting a battle cry, out of my father's head after he got a terrible headache. Some versions of the myth say Hephaestus split his skull with an axe to let me out."],
+          ["Symbols","My sacred animal is the owl, my sacred tree is the olive, and I carry a shield with the head of Medusa on it, called the aegis."],
+          ["Domain","I am the goddess of wisdom and strategic warfare, and also of crafts, weaving and the arts. Heroes such as Odysseus, Perseus and Heracles relied on my help."],
+          ["Rivalry","I once beat the god of the sea in a contest to become the patron of a great city. My gift was the olive tree, and his was a saltwater spring."]
+        ],
+        aside:"My Roman counterpart doesn't fit the topic."
+      },
+      answer:"Athena",
+      credit:"Goddess of wisdom and strategic warfare — and, by that harbor contest, patron of Athens itself." },
+
+    { body:["This chronic respiratory condition takes its name from an ancient Greek word meaning “panting,” first used by Hippocrates around 450 BCE.", "It inflames and narrows the airways — causing wheezing, coughing, chest tightness and shortness of breath — often triggered by allergens, cold air, exercise, smoke or stress."],
+      ask:"It's one of the most common chronic diseases in children, affecting over 260 million people worldwide — yet no barrier to plenty of Olympic endurance and cold-weather athletes. Name the condition.",
+      answer:"Asthma",
+      credit:"From ancient “panting” to modern inhalers — and no obstacle to Olympic gold." },
+
+    { quote:"Okay, tiny mathematician, here we go! See the big round ball? 🔵 Now watch... a little straight stick comes along, and it goes boop, touches the ball just one tiny time, right there! Just one kiss, no squishing inside, no poking through. Just... boop, and bye-bye stick, off it goes!",
+      ask:"That special boop-stick has a big-kid name. What is it?",
+      answer:"Tangent",
+      credit:"A line that touches a curve at exactly one point, without crossing it — explained in board-book language." },
+
+    { body:["This 1977 film franchise, created by George Lucas, began with a story about a farm boy on a desert planet who joins a rebellion against an evil Galactic Empire."],
+      ask:"May the right answer be with you. Name the saga.",
+      answer:"Star Wars",
+      credit:"Luke Skywalker, Tatooine, and the Empire — the saga that launched a galaxy far, far away." },
+  ];
+
+  /* ================= ROUND 3 — NOT ONLY METAL BANDS ================= */
+  const METAL_QUESTIONS = [
+    { band:"Rammstein", song:"Links 2 3 4", track:"assets/audio_rammstein.mp4",
+      body:["A United States Air Force installation located in Rhineland-Palatinate, southwestern Germany.", "It serves as the headquarters for the United States Air Forces in Europe – Air Forces Africa (USAFE-AFAFRICA) and NATO Allied Air Command (AIRCOM)."],
+      ask:"Name the base.",
+      images:[{ src:"assets/metal_rammstein_airbase.jpg", alt:"Aerial view of an air base with hangars, runways and parked military aircraft", frame:"landscape" }],
+      answer:"Ramstein Air Base",
+      credit:"Home of USAFE-AFAFRICA and NATO's Allied Air Command — same sound, one fewer M than the band." },
+
+    { band:"Avatar", song:"Hail the Apocalypse", track:"assets/audio_avatar.mp4",
+      body:["A 2009 epic science-fiction film, written and directed by James Cameron.", "Set in the mid-22nd century, it follows humans exploiting the natives of a distant moon, who have a different skin colour."],
+      ask:"Name the film.",
+      answer:"Avatar",
+      credit:"James Cameron's Pandora epic — one of the highest-grossing films ever made." },
+
+    { band:"Pantera", song:"Walk", track:"assets/audio_pantera.mp4",
+      body:["This genus includes lions, tigers, jaguars and leopards, whose members are unique among cats for having a specialized larynx that lets them roar rather than purr continuously.", "Its black cats aren't a separate species at all — just melanistic (dark-coated) individuals, usually leopards in Asia and Africa, or jaguars in the Americas."],
+      ask:"Name the genus.",
+      answer:"Panthera",
+      credit:"So-called “black panthers” are simply melanistic leopards or jaguars — not a species of their own." },
+
+    { band:"Korn", song:"Hater", track:"assets/audio_korn.mp4",
+      body:["This crop was first domesticated from a wild grass called teosinte in southern Mexico roughly 9,000 years ago, and has since become one of the most widely grown cereal crops on Earth.", "Unlike wheat or rice, each plant bears its kernels on a single ear wrapped in husks, topped with a tuft of silk — one strand per kernel."],
+      ask:"Name the crop.",
+      answer:"Corn (Maize)",
+      credit:"Domesticated from teosinte in southern Mexico — same sound as the band, different spelling." },
+
+    { band:"Iron Maiden", song:"Fear of the Dark", track:"assets/audio_iron_maiden.mp4",
+      body:["An apocryphal torture device, believed to have first been invented in the 19th century.", "It's a solid iron cabinet with a hinged front and spike-covered interior, tall enough to enclose a human being. Though popularly imagined as medieval, there's no known mention of it before the 1800s."],
+      ask:"Name the device.",
+      images:[{ src:"assets/metal_iron_maiden_device.jpg", alt:"A tall iron cabinet with a hinged, spike-lined door, standing open in a museum alcove", frame:"portrait" }],
+      answer:"Iron Maiden",
+      credit:"Probably a 19th-century invention dressed up as medieval — no contemporary account describes one before then." },
+
+    { band:"Danzig", song:"Mother", track:"assets/audio_danzig.mp4",
+      body:["A city on the Baltic coast of northern Poland, and the capital of the Pomeranian Voivodeship.", "With a population of 486,492, it's Poland's sixth-largest city and its major seaport."],
+      ask:"Give its Polish or German name.",
+      answer:"Gdańsk (Danzig)",
+      credit:"Danzig is simply the city's German name — Poland calls it Gdańsk." },
+
+    { band:"Tool", song:"Schism", track:"assets/audio_tool.mp4",
+      myth:{
+        tab:"FOUR CLUES, ONE WORD",
+        sub:"Every line below — four letters, same answer",
+        rows:[
+          ["1","Intermediary between intention and outcome, borrowed from the world. (4)"],
+          ["2","What a hand becomes when it wants more than a hand can do. (4)"],
+          ["3","It changes nothing by itself, but nothing changes without it. (4)"],
+          ["4","Object whose meaning vanishes the moment no one needs anything done. (4)"]
+        ]
+      },
+      answer:"Tool",
+      credit:"Four cryptic ways of describing the same everyday word." },
+
+    { band:"Gojira", song:"Flying Whales", track:"assets/audio_gojira.mp4",
+      body:["This giant monster first appeared in a 1954 film of the same name, directed by Ishiro Honda.", "It's since become an international pop-culture icon, appearing in 38 films, video games, novels, comics and TV shows."],
+      ask:"Name the kaiju.",
+      answer:"Godzilla (Gojira)",
+      credit:"Gojira — a portmanteau of gorira (gorilla) and kujira (whale) — is the monster's original Japanese name." },
+
+    { band:"Type O Negative", song:"Black No. 1", track:"assets/audio_type_o_negative.mp4",
+      body:["The universal red-blood-cell donor type, because it lacks A, B and Rh(D) antigens — meaning anyone can safely receive it.", "Only 7–8% of the population has it, yet it accounts for roughly 13–16% of hospital blood requests."],
+      ask:"Name the blood type.",
+      answer:"Type O Negative",
+      credit:"The universal donor type — rare, but always in demand." },
+
+    { band:"Paradise Lost", song:"Ghosts", track:"assets/audio_paradise_lost.mp4",
+      body:["An epic poem in blank verse by the English poet John Milton, concerning the biblical story of the fall of man."],
+      ask:"Name the poem.",
+      answer:"Paradise Lost",
+      credit:"Milton's 1667 epic — same title as the band, right down to the words." },
+  ];
+
+  /* ================= ROUND 4 — CHA-GAL MATRIX ================= */
+  const CHAGAL_PEOPLE = [
+    { name:"Charlemagne", cat:"CHA",
+      img:"assets/cha_charlemagne.jpg",
+      credit:"Frankish king crowned Holy Roman Emperor, 800 CE" },
+    { name:"Charlie Chaplin", cat:"CHA",
+      img:"assets/cha_chaplin.jpg",
+      credit:"Actor and director who defined silent-film comedy" },
+    { name:"Coco Chanel", cat:"CHA",
+      img:"assets/cha_chanel.jpg",
+      credit:"Fashion designer, founder of the House of Chanel" },
+    { name:"Ray Charles", cat:"CHA",
+      img:"assets/cha_ray_charles.jpg",
+      credit:"Musician, pioneer of soul music" },
+    { name:"Didier Deschamps", cat:"CHA",
+      img:"assets/cha_deschamps.jpg",
+      credit:"Football manager, World Cup winner as player and coach" },
+    { name:"Galileo Galilei", cat:"GAL",
+      img:"assets/gal_galileo.jpg",
+      credit:"Astronomer and physicist, 16th–17th century" },
+    { name:"Noel Gallagher", cat:"GAL",
+      img:"assets/gal_gallagher.jpg",
+      credit:"Musician, songwriter and co-founder of Oasis" },
+    { name:"Évariste Galois", cat:"GAL",
+      img:"assets/gal_galois.jpg",
+      img2:"assets/gal_galois_theory.jpg",
+      img2Label:"A field extension and its symmetry groups",
+      credit:"Mathematician who founded group theory, d. 1832" },
+    { name:"Luigi Galvani", cat:"GAL",
+      img:"assets/gal_galvani.jpg",
+      img2:"assets/gal_galvani_plate.jpg",
+      img2Label:"Plate from his 1791 treatise on the frog-leg experiments",
+      credit:"Scientist, pioneer of bioelectricity" },
+    { name:"Steven Seagal", cat:"GAL",
+      img:"assets/gal_seagal.jpg",
+      credit:"Actor and martial artist" },
+  ];
+
+  /* ================= ROUND 5 — NOT ONLY PSYCHOANALYTIC DIAGNOSIS ================= */
+  const PSYCH_QUESTIONS = [
+    { term:"NARCISSISM",
+      ask:"Name the flower — or the demigod.",
+      images:[
+        { src:"assets/psych_narcissus_painting.jpg", label:"The myth", alt:"Youth gazing at his reflection in a pool" },
+        { src:"assets/psych_narcissus_flower.webp", label:"The flower", alt:"Narcissus poeticus, the pheasant's-eye daffodil" }
+      ],
+      answer:"Narcissus",
+      credit:"The self-absorbed youth of Greek myth — and the flower genus that carries his name." },
+
+    { term:"ENVY",
+      body:["Envy is the unconscious impulse to spoil or destroy a good object — rather than merely possess it — precisely because it is good and belongs to another."],
+      ask:"Name one of its six remaining “brothers.”",
+      answer:"Pride, Greed, Lust, Gluttony, Wrath, or Sloth",
+      credit:"Envy is one of the seven deadly sins — naming any of the other six wins the point." },
+
+    { term:"CONSCIENCE",
+      body:["One therapist — renowned for her work with antisocial clients — recalls this exchange with a court-remanded car thief:"],
+      quote:"“The man was explaining to me how brilliant his scheme had been for the heist he had almost pulled off, how if only one little unforeseen thing hadn't happened, it would have been the perfect crime. Eventually he got so carried away that he asked, ‘Would you do something like that?’\n‘No,’ I answered.\n‘Why not?’ he asked, a little deflated.\n‘Two reasons,’ I said. ‘First, there is always some little thing that can go wrong, even with a brilliant plan. Life isn't that controllable. And second, I wouldn't — because I have something that you don't: THIS.’\n‘Yeah,’ he said. ‘You know how I could get one of those?’”",
+      ask:"The author of this question has THIS and feels bad about you struggling with only one hint, so here is another one: Pinocchio's companion Jiminy Cricket literally represents THIS concept.",
+      answer:"Conscience",
+      credit:"What the antisocial client lacked — and what Jiminy Cricket was written to embody." },
+
+    { term:"HIPPOCAMPUS",
+      body:["This temporal-lobe structure encodes new declarative and spatial memories and consolidates them for long-term storage in the cortex.", "It is highly sensitive to chronic stress and cortisol — showing reduced volume in depression, PTSD and prolonged stress — making it a key target of therapies aimed at reversing stress-related atrophy."],
+      images:[
+        { src:"assets/psych_hippocampus.jpg", label:"Highlighted in red — in the brain, and in its Greek namesake", alt:"Diagrams of the hippocampus in the brain and a seahorse, both highlighted in red", frame:"wide" }
+      ],
+      answer:"Hippocampus",
+      credit:"Named — and shaped — for the seahorse: Greek hippokampos." },
+
+    { term:"SOMATIZATION",
+      body:["Somatization is the process by which psychological distress shows up as physical symptoms."],
+      ask:"In which 1932 dystopia — written by Aldous Huxley — is soma a legally mandated recreational drug, used by the World State to keep citizens docile, distracted and emotionally numb?",
+      answer:"Brave New World",
+      credit:"Huxley's soma keeps the World State's citizens blissfully, chemically compliant." },
+
+    { term:"COMPARTMENTALIZATION",
+      body:["Compartmentalization is a defense mechanism: separating conflicting thoughts, emotions or experiences into distinct mental categories to avoid anxiety or cognitive dissonance."],
+      ask:"What is the maximum weight most low-cost airlines allow for an overhead-compartment bag?",
+      answer:"10 kg",
+      credit:"Give or take — most budget carriers cap cabin bags around 10 kg." },
+
+    { term:"HYPNOSIS",
+      body:["Hypnotherapy uses guided hypnosis to bring on a state of deep relaxation and focused concentration."],
+      ask:"It takes its name from Hypnos, the Greek god of what?",
+      answer:"Sleep",
+      credit:"Hypnos — twin brother of Thanatos, Death — personified sleep itself." },
+
+    { term:"DISPLACEMENT",
+      body:["Displacement redirects a drive, emotion or impulse from its original — anxiety-inducing — target onto a safer one."],
+      ask:"What's the name of one of the earliest documented examples, from Leviticus: an animal symbolically loaded with the sins of the people, then driven into the wilderness as part of the Yom Kippur ceremony?",
+      answer:"Scapegoat",
+      credit:"The literal origin of the word we still use for displaced blame." },
+
+    { term:"STIGMA",
+      body:["This word originally named a physical mark — burned or cut into the skin of slaves, criminals or traitors in Ancient Greece — to permanently signal disgrace. It derives from a Greek word meaning “to prick” or “tattoo.”", "Today it no longer involves branding, but still names a mark of shame or disgrace, often attached to mental illness, disease or social difference."],
+      answer:"Stigma",
+      credit:"From literal brand to metaphorical one — the word never lost its sting." },
+
+    { term:"REPETITION COMPULSION",
+      caseFile:{
+        note:"adult male, wealthy, unsupervised. Witnessed parents' murder at age 8; never sought therapy — chose costumed vigilantism instead. Classic repetition compulsion.",
+        items:[
+          ["Sublimation", "rage → gadgets and a concerning fitness routine"],
+          ["Displacement", "hatred of one killer → entire city's criminal population"],
+          ["Reaction formation", "carefree playboy by day masks punishing avenger by night"],
+          ["Attachment", "avoidant; collects young wards, possibly trying to become the father he lost"]
+        ],
+        closing:"Refuses medication, therapy, or retiring the cape. Unusually attached to a cave.",
+        sign:"— attending psychotherapist, private session notes"
+      },
+      answer:"Batman",
+      credit:"Gotham's most over-defended patient." },
+  ];
+
+  /* ================= ROUNDS TABLE ================= */
+  const ROUNDS = [
+    { key:"sept26", kind:"quiz", label:"September 26th",
+      brand:'<b>SEP</b><span class="sep" id="brandSep">·</span><b>26</b> ROUND',
+      title:'<div class="slide text-slide">'
+        + '<div class="divider-eyebrow">THIS DAY IN HISTORY · 10 QUESTIONS</div>'
+        + '<h1 class="headline">September 26th</h1>'
+        + '<div class="round-rule">Ten unconnected events, one calendar date — scattered across nearly 450 years.</div>'
+        + '</div>',
+      questions:SEPT26_QUESTIONS },
+
+    { key:"uroboros", kind:"quiz", label:"Uroboros",
+      brand:'<b>URO</b><span class="sep" id="brandSep">·</span><b>BOROS</b> ROUND',
+      title:'<div class="slide text-slide">'
+        + '<div class="divider-eyebrow">PICTURE + TRIVIA ROUND · 10 QUESTIONS</div>'
+        + '<h1 class="headline">Uroboros</h1>'
+        + '<div class="codeline"><span class="quote">“</span>the snake that eats its own tail<span class="quote">”</span></div>'
+        + '<div class="round-rule">All answers in this round begin and end with the same letter.</div>'
+        + '</div>',
+      questions:UROBOROS_QUESTIONS },
+
+    { key:"metal", kind:"quiz", label:"Not only metal bands",
+      brand:'<b>NOT</b><span class="sep" id="brandSep">·</span><b>METAL</b> ROUND',
+      title:'<div class="slide text-slide">'
+        + '<div class="divider-eyebrow">PICTURE + AUDIO ROUND · 10 QUESTIONS</div>'
+        + '<h1 class="headline">Not only names<br>of metal bands</h1>'
+        + '<div class="round-rule">Every band below shares its name with something else entirely — hear the clip, then name the other thing.</div>'
+        + '</div>',
+      questions:METAL_QUESTIONS },
+
+    { key:"chagal", kind:"picture", label:"Matrix — CHA·GAL",
+      brand:'<b>CHA</b><span class="sep" id="brandSep">·</span><b>GAL</b> MATRIX',
+      title:'<div class="slide text-slide">'
+        + '<div class="divider-eyebrow">WHO IS THIS · 10 QUESTIONS</div>'
+        + '<h1 class="headline">Matrix</h1>'
+        + '<div class="codeline"><span class="quote">“</span><span class="cha">-CHA-</span> <span class="gal">-GAL-</span><span class="quote">”</span></div>'
+        + '<div class="round-rule">Every name below hides one of these two syllables.</div>'
+        + '</div>',
+      questions:CHAGAL_PEOPLE },
+
+    { key:"psych", kind:"quiz", label:"Not only psychoanalytic diagnosis",
+      brand:'<b>PSYCH</b><span class="sep" id="brandSep">·</span><b>DX</b> QUIZ',
+      title:'<div class="slide text-slide">'
+        + '<div class="divider-eyebrow">PICTURE + TERM ROUND · 10 QUESTIONS</div>'
+        + '<h1 class="headline small">Not only terms</h1>'
+        + '<div class="codeline"><span class="quote">“</span>from Psychoanalytic Diagnosis<span class="quote">”</span></div>'
+        + '</div>',
+      questions:PSYCH_QUESTIONS },
+  ];
+
+  const ROUND_LEN = 22; // title + 10 q + divider + 10 a, same shape for every round
+  const roundStart = ROUNDS.map((_,i) => i * ROUND_LEN);
+
+  const SLIDES = [];
+  ROUNDS.forEach((r, ri) => {
+    SLIDES.push({type:'title', ri});
+    r.questions.forEach((q,i) => SLIDES.push({type:'q', ri, q, n:i+1}));
+    SLIDES.push({type:'divider', ri});
+    r.questions.forEach((q,i) => SLIDES.push({type:'a', ri, q, n:i+1}));
+  });
+  SLIDES.push({type:'end'});
+
+  const stage = document.getElementById('stage');
+  const counter = document.getElementById('counter');
+  const dotsEl = document.getElementById('dots');
+  const hintEl = document.getElementById('hintEl');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const accentRule = document.getElementById('accentRule');
+  const brandEl = document.getElementById('brandEl');
+  const roundTag = document.getElementById('roundTag');
+  const roundMenu = document.getElementById('roundMenu');
+  const app = document.getElementById('app');
+  const fsBtn = document.getElementById('fsBtn');
+
+  let idx = 0;
+
+  const player = new Audio();
+  let playerTrack = null;
+  const PLAY_ICON = '▶';
+  const PAUSE_ICON = '❘❘';
+
+  function updatePlayButton(){
+    const btn = stage.querySelector('.play-btn');
+    if (!btn) return;
+    const isThisTrack = btn.dataset.track === playerTrack;
+    const isPlaying = isThisTrack && !player.paused && !player.ended;
+    btn.classList.toggle('is-playing', isPlaying);
+    btn.textContent = isPlaying ? PAUSE_ICON : PLAY_ICON;
+  }
+  player.addEventListener('play', updatePlayButton);
+  player.addEventListener('pause', updatePlayButton);
+  player.addEventListener('ended', updatePlayButton);
+
+  function esc(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function paras(lines){
+    return (lines||[]).map(t => '<p>' + esc(t) + '</p>').join('');
+  }
+
+  function quoteBlock(text){
+    if (!text) return '';
+    const html = esc(text).split('\n').join('<br>');
+    return '<blockquote class="q-quote">' + html + '</blockquote>';
+  }
+
+  function mythBlock(m){
+    if (!m) return '';
+    const sep = m.sep || '.';
+    let html = '<div class="myth-card">';
+    html += '<div class="myth-tab">' + esc(m.tab) + '</div>';
+    if (m.sub) html += '<div class="myth-sub">' + esc(m.sub) + '</div>';
+    html += m.rows.map(([k,v]) => '<p><span class="clue-label">' + esc(k) + sep + '</span> ' + esc(v) + '</p>').join('');
+    if (m.aside) html += '<p class="myth-aside">' + esc(m.aside) + '</p>';
+    html += '</div>';
+    return html;
+  }
+
+  function caseFileBlock(cf){
+    if (!cf) return '';
+    let html = '<div class="case-file">';
+    html += '<div class="case-file-tab">CASE FILE</div>';
+    html += '<div class="case-file-stamp">CONFIDENTIAL</div>';
+    html += '<div class="case-file-title">Clinical Notes</div>';
+    html += '<div class="case-file-sub">Private practice — session summary</div>';
+    html += '<p><span class="cf-label">Patient:</span> <span class="redacted">REDACTED&nbsp;&nbsp;&nbsp;&nbsp;</span> — ' + esc(cf.note) + '</p>';
+    html += '<ul>' + cf.items.map(([k,v]) => '<li><span class="cf-label">' + esc(k) + ':</span> ' + esc(v) + '</li>').join('') + '</ul>';
+    html += '<p>' + esc(cf.closing) + '</p>';
+    if (cf.sign) html += '<div class="case-file-sign">' + esc(cf.sign) + '</div>';
+    html += '</div>';
+    return html;
+  }
+
+  function chipsBlock(examples){
+    if (!examples || !examples.length) return '';
+    return '<div class="chip-row">' + examples.map(e => '<span class="chip">' + esc(e) + '</span>').join('') + '</div>';
+  }
+
+  function tag(label){
+    return label ? '<div class="panel-tag">' + esc(label) + '</div>' : '';
+  }
+
+  const FRAME_CLASS = {
+    wide:'frame-wide',
+    'wide-alt':'frame-wide-alt',
+    portrait:'frame-portrait',
+    landscape:'frame-landscape',
+    single:'frame-single'
+  };
+
+  function imagesBlock(images){
+    if (!images || !images.length) return '';
+    if (images.length > 1){
+      return '<div class="frame-row">' + images.map(im =>
+        '<div class="frame-half"><img src="' + im.src + '" alt="' + esc(im.alt) + '">' + tag(im.label) + '</div>'
+      ).join('') + '</div>';
+    }
+    const im = images[0];
+    const cls = FRAME_CLASS[im.frame] || 'frame-single';
+    return '<div class="' + cls + '"><img src="' + im.src + '" alt="' + esc(im.alt) + '">' + tag(im.label) + '</div>';
+  }
+
+  function trackBarHTML(q){
+    return '<div class="track-bar">'
+      + '<button class="play-btn" data-track="' + esc(q.track) + '" aria-label="Play music clip">' + PLAY_ICON + '</button>'
+      + '<div class="track-hint">PLAY THE CLIP</div>'
+      + '</div>';
+  }
+
+  function dividerHTML(){
+    return '<div class="slide text-slide">'
+      + '<div class="divider-eyebrow">10 OF 10 REVEALED</div>'
+      + '<h1 class="headline">Answers</h1>'
+      + '</div>';
+  }
+
+  function endSlideHTML(){
+    return '<div class="slide text-slide end-slide">'
+      + '<div class="divider-eyebrow">BIRTHDAY QUIZ #26</div>'
+      + '<div class="end-frame"><img src="assets/finale_photo.jpg" alt="A birthday memory — a grinning kid with a red-stained face and hands, holding a spoon"></div>'
+      + '<h1 class="end-headline">Thank you for being here today with me!</h1>'
+      + '</div>';
+  }
+
+  function quizSlideHTML(s){
+    const q = s.q;
+    const phase = s.type; // 'q' or 'a'
+    const images = phase === 'a' ? (q.answerImages || q.images) : q.images;
+    const hasImage = !!(images && images.length);
+    const idxTag = '<div class="q-index">' + (phase === 'q' ? 'Q' : 'A') + String(s.n).padStart(2,'0') + '</div>';
+
+    let cardInner;
+    if (phase === 'a' && q.term){
+      cardInner = '<div class="q-top"><div class="term-badge a">' + esc(q.term) + '</div>' + idxTag + '</div>';
+    } else {
+      cardInner = '<div class="q-top solo">' + idxTag + '</div>';
+    }
+
+    if (q.track) cardInner += trackBarHTML(q);
+
+    if (phase === 'q'){
+      cardInner += '<div class="q-body">';
+      if (q.myth){
+        cardInner += mythBlock(q.myth);
+      } else if (q.caseFile){
+        cardInner += caseFileBlock(q.caseFile);
+      } else {
+        cardInner += paras(q.body);
+        cardInner += quoteBlock(q.quote);
+        if (q.ask) cardInner += '<p class="q-ask">' + esc(q.ask) + '</p>';
+        if (q.note) cardInner += '<p class="q-note">' + esc(q.note) + '</p>';
+      }
+      cardInner += '</div>';
+    } else {
+      cardInner += '<div class="answer-tag">' + esc(q.answerTag || 'ANSWER') + '</div>'
+        + '<h2 class="name">' + esc(q.answer) + '</h2>'
+        + chipsBlock(q.examples)
+        + '<div class="credit">' + esc(q.credit) + '</div>';
+    }
+
+    const card = '<div class="q-card">' + cardInner + '</div>';
+    const frame = hasImage ? imagesBlock(images) : '';
+
+    return '<div class="slide quiz-slide' + (hasImage ? ' has-image' : '') + '">'
+      + card
+      + frame
+      + '<div class="click-zone left" data-dir="-1"></div>'
+      + '<div class="click-zone right" data-dir="1"></div>'
+      + '</div>';
+  }
+
+  function chagalSlideHTML(s){
+    const p = s.q;
+    const catClass = p.cat.toLowerCase();
+    const badge = '<div class="badge ' + catClass + '">-' + p.cat + '-</div>';
+    const altName = s.type === 'a' ? p.name : ('Mystery person ' + s.n);
+    const frame = p.img2
+      ? '<div class="chagal-frame-dual">'
+          + '<div class="chagal-frame-half">'
+            + '<img src="' + p.img + '" alt="' + esc(altName) + '">'
+            + badge
+          + '</div>'
+          + '<div class="chagal-frame-half works">'
+            + '<img src="' + p.img2 + '" alt="' + esc(p.img2Label) + '">'
+            + '<div class="panel-tag">' + esc(p.img2Label) + '</div>'
+          + '</div>'
+        + '</div>'
+      : '<div class="frame"><img src="' + p.img + '" alt="' + esc(altName) + '">' + badge + '</div>';
+    const caption = s.type === 'a'
+      ? '<div class="answer-tag">ANSWER ' + String(s.n).padStart(2,'0') + '</div>'
+        + '<h2 class="name">' + esc(p.name) + '</h2>'
+        + '<div class="credit">' + esc(p.credit) + '</div>'
+      : '<div class="prompt">WHO IS THIS — Q' + String(s.n).padStart(2,'0') + '</div>';
+    return '<div class="slide pic-slide">'
+      + '<div class="frame-wrap">'
+        + frame
+        + '<div class="click-zone left" data-dir="-1"></div>'
+        + '<div class="click-zone right" data-dir="1"></div>'
+      + '</div>'
+      + '<div class="caption">' + caption + '</div>'
+      + '</div>';
+  }
+
+  function slideHTML(s){
+    if (s.type === 'end') return endSlideHTML();
+    const round = ROUNDS[s.ri];
+    if (s.type === 'title') return round.title;
+    if (s.type === 'divider') return dividerHTML();
+    return round.kind === 'picture' ? chagalSlideHTML(s) : quizSlideHTML(s);
+  }
+
+  function renderDots(s){
+    dotsEl.innerHTML = '';
+    if (s.ri == null){
+      hintEl.textContent = 'You’ve reached the end · ← to look back';
+      return;
+    }
+    hintEl.textContent = '← → or tap the edges to move · click a dot to jump';
+    const start = roundStart[s.ri];
+    for (let i = 0; i < ROUND_LEN; i++){
+      const globalIdx = start + i;
+      const gs = SLIDES[globalIdx];
+      const b = document.createElement('button');
+      b.className = 'dot';
+      if (gs.type === 'q' || gs.type === 'a') b.classList.add(gs.type);
+      if (i === 1 || i === 11) b.classList.add('gap-before');
+      if (globalIdx === idx) b.classList.add('current');
+      b.setAttribute('aria-label', 'Go to slide ' + (i+1) + ' of round ' + (s.ri+1));
+      b.addEventListener('click', () => { idx = globalIdx; render(); });
+      dotsEl.appendChild(b);
+    }
+  }
+
+  function buildRoundMenu(){
+    roundMenu.innerHTML = ROUNDS.map((r,ri) =>
+      '<button type="button" class="round-menu-item" data-ri="' + ri + '" role="menuitem">'
+        + '<span class="rn">' + String(ri+1).padStart(2,'0') + '</span>'
+        + '<span class="rl">' + esc(r.label) + '</span>'
+      + '</button>'
+    ).join('');
+    roundMenu.querySelectorAll('.round-menu-item').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const ri = parseInt(btn.dataset.ri, 10);
+        idx = roundStart[ri];
+        render();
+      });
+    });
+  }
+
+  function openRoundMenu(){
+    const s = SLIDES[idx];
+    roundMenu.querySelectorAll('.round-menu-item').forEach(btn => {
+      btn.classList.toggle('current', s.ri != null && parseInt(btn.dataset.ri,10) === s.ri);
+    });
+    roundMenu.hidden = false;
+    roundTag.setAttribute('aria-expanded','true');
+  }
+
+  function closeRoundMenu(){
+    roundMenu.hidden = true;
+    roundTag.setAttribute('aria-expanded','false');
+  }
+
+  roundTag.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (roundMenu.hidden) openRoundMenu(); else closeRoundMenu();
+  });
+  roundMenu.addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', () => { if (!roundMenu.hidden) closeRoundMenu(); });
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !roundMenu.hidden){ closeRoundMenu(); }
+  });
+  buildRoundMenu();
+
+  function render(){
+    player.pause();
+    closeRoundMenu();
+
+    const s = SLIDES[idx];
+    stage.innerHTML = slideHTML(s);
+
+    const totalDigits = String(SLIDES.length).length;
+    counter.textContent = String(idx+1).padStart(totalDigits,'0') + ' / ' + SLIDES.length;
+    prevBtn.disabled = idx === 0;
+    nextBtn.disabled = idx === SLIDES.length - 1;
+
+    const round = (s.ri != null) ? ROUNDS[s.ri] : null;
+    brandEl.innerHTML = round ? round.brand : FINALE_BRAND;
+    roundTag.textContent = round ? ('ROUND ' + (s.ri+1) + ' OF ' + ROUNDS.length) : 'THE END';
+    roundTag.style.display = round ? '' : 'none';
+
+    let accent = 'var(--text-dim)';
+    if (s.type === 'q') accent = 'var(--gold)';
+    else if (s.type === 'a') accent = 'var(--teal)';
+    app.style.setProperty('--accent', accent);
+    accentRule.style.background = accent;
+    const brandSep = document.getElementById('brandSep');
+    if (brandSep) brandSep.style.color = accent;
+
+    const playBtn = stage.querySelector('.play-btn');
+    if (playBtn){
+      playBtn.addEventListener('click', () => {
+        const track = playBtn.dataset.track;
+        if (playerTrack === track && !player.paused){
+          player.pause();
+        } else {
+          if (playerTrack !== track){
+            player.src = track;
+            playerTrack = track;
+          }
+          player.play().catch(()=>{});
+        }
+      });
+      updatePlayButton();
+    }
+
+    stage.querySelectorAll('.click-zone').forEach(z => {
+      z.addEventListener('click', () => go(parseInt(z.dataset.dir,10)));
+    });
+
+    renderDots(s);
+  }
+
+  function go(delta){
+    const next = idx + delta;
+    if (next < 0 || next >= SLIDES.length) return;
+    idx = next;
+    render();
+  }
+
+  prevBtn.addEventListener('click', () => go(-1));
+  nextBtn.addEventListener('click', () => go(1));
+
+  window.addEventListener('keydown', (e) => {
+    if (e.target && e.target.classList && e.target.classList.contains('play-btn')) return;
+    if (['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){ e.preventDefault(); go(1); }
+    else if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); go(-1); }
+    else if (e.key === 'Home'){ e.preventDefault(); idx = 0; render(); }
+    else if (e.key === 'End'){ e.preventDefault(); idx = SLIDES.length - 1; render(); }
+  });
+
+  let touchX = null;
+  app.addEventListener('touchstart', (e) => { touchX = e.changedTouches[0].clientX; }, {passive:true});
+  app.addEventListener('touchend', (e) => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 44) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, {passive:true});
+
+  fsBtn.addEventListener('click', () => {
+    if (!document.fullscreenElement){
+      document.documentElement.requestFullscreen?.().catch(()=>{});
+    } else {
+      document.exitFullscreen?.().catch(()=>{});
+    }
+  });
+
+  render();
+})();
+</script>
